@@ -1,0 +1,144 @@
+/* ============================================================
+   Sistema de aparência — apenas dois modos (Dark e Normal)
+   ------------------------------------------------------------
+   As paletas dos dois modos vivem em estilo.css (base) e nuvia.css
+   (identidade Nuvia). Este arquivo guarda os acabamentos
+   compartilhados e o Lofi Mode — a camada opcional que funciona
+   nos dois modos (ativa via [data-lofi='on'] no <html>).
+
+   ⭐ Para adicionar um modo novo:
+     1. Cadastre o modo em backend/src/temas.js;
+     2. Crie o bloco de variáveis correspondente em frontend/nuvia.css.
+   ============================================================ */
+
+/* No Dark Mode a etiqueta usa a própria cor de destaque
+   (no Normal Mode mantemos os tons mais escuros de estilo.css). */
+[data-tema='nuvia'] {
+  --tipo-tarefa-texto: var(--tipo-tarefa);
+  --tipo-entrega-texto: var(--tipo-entrega);
+  --tipo-prova-texto: var(--tipo-prova);
+  --tipo-projeto-texto: var(--tipo-projeto);
+  --tipo-evento-texto: var(--tipo-evento);
+}
+
+/* ---------- Transição suave na troca de tema ---------- */
+html.tema-transicao *:not(svg):not(path) {
+  transition: background-color 0.35s ease, background 0.35s ease, color 0.35s ease,
+    border-color 0.35s ease, box-shadow 0.35s ease !important;
+}
+
+/* ---------- Lofi Mode — rádio lo-fi flutuante ----------
+   Renderizado sempre no HTML, mas só aparece com o modo ativo.
+   Somente quando a gaveta está oculta (tablet/celular em paisagem):
+   no desktop ela ocupa a lateral toda e o rádio cobriria o conteúdo. */
+.tema-decoracao {
+  display: block;
+}
+.deco-lofi {
+  display: none;
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 39;
+  pointer-events: none;
+  font-family: 'Pixelify Sans', 'Courier New', ui-monospace, monospace;
+}
+@media (min-width: 701px) and (max-width: 1023px) {
+  [data-lofi='on'] .deco-lofi {
+    display: block;
+  }
+}
+.deco-lofi-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #232042;
+  border: 2px solid #3a3568;
+  border-radius: 16px 4px 16px 4px;
+  box-shadow: 4px 4px 0 rgba(10, 8, 24, 0.42), 0 0 0 1px rgba(203, 184, 234, 0.1),
+    0 0 22px rgba(167, 139, 250, 0.18);
+  animation: lofi-flutua 5s ease-in-out infinite;
+}
+[data-tema-modo='claro'] .deco-lofi-player {
+  background: #fffaf4;
+  border-color: #e3cfe0;
+  box-shadow: 4px 4px 0 rgba(120, 82, 130, 0.18), 0 0 22px rgba(167, 123, 216, 0.16);
+}
+.deco-lofi-nota {
+  font-size: 22px;
+  color: #ffb4d9;
+  animation: nota-balanca 2.4s ease-in-out infinite;
+}
+[data-tema-modo='claro'] .deco-lofi-nota {
+  color: #d8638c;
+}
+.deco-lofi-textos {
+  display: grid;
+  line-height: 1.25;
+}
+.deco-lofi-textos strong {
+  font-size: 13px;
+  color: #e9e6ff;
+}
+.deco-lofi-textos small {
+  font-size: 11px;
+  color: #a6a0d0;
+}
+[data-tema-modo='claro'] .deco-lofi-textos strong {
+  color: #4a3a63;
+}
+[data-tema-modo='claro'] .deco-lofi-textos small {
+  color: #8b789e;
+}
+.deco-equalizador {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 18px;
+}
+.deco-equalizador i {
+  display: block;
+  width: 4px;
+  background: #a78bfa;
+  border-radius: 1px;
+  animation: equalizador 1.1s ease-in-out infinite;
+}
+.deco-equalizador i:nth-child(2) {
+  animation-delay: 0.18s;
+  background: #ffb4d9;
+}
+.deco-equalizador i:nth-child(3) {
+  animation-delay: 0.36s;
+}
+.deco-equalizador i:nth-child(4) {
+  animation-delay: 0.54s;
+  background: #7fd8c0;
+}
+@keyframes equalizador {
+  0%, 100% { height: 5px; }
+  50% { height: 17px; }
+}
+@keyframes nota-balanca {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+}
+@keyframes lofi-flutua {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Em telas pequenas o widget sai do caminho */
+@media (max-width: 700px) {
+  .deco-lofi {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deco-lofi-player,
+  .deco-lofi-nota,
+  .deco-equalizador i {
+    animation: none;
+  }
+}

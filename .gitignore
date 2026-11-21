@@ -1,0 +1,21 @@
+# Dependências
+node_modules/
+
+# Segredos (banco de dados, senhas)
+.env
+.env.local
+
+# Vercel (links locais do projeto)
+.vercel/
+
+# Arquivos enviados pelos alunos
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Sistema
+*.log
+.DS_Store
+
+# Banco PostgreSQL local (modo desenvolvimento)
+.pglocal/
+backend/.pglocal/
