@@ -1,331 +1,78 @@
-# 🎓 Classroom Escolar — Nuvia
+# ☁️ NUVIA — Seu cantinho de estudos.
 
-Site para a escola onde os alunos enviam seus trabalhos **direto para o professor daquela matéria**, com escolha automática de **turma → matéria → professor**, correção com nota/observação e um dashboard acolhedor em **pixel art** — o canto de estudos **Nuvia**, com gatinhos, laços e um planner semanal.
+**Estudar não precisa ser uma bagunça. Organize sua rotina, acompanhe seu progresso e transforme a experiência escolar em algo mais leve.**
 
-Feito com **Express** (Node.js) + **PostgreSQL**, com páginas HTML renderizadas no servidor.
+O Nuvia é uma plataforma de organização escolar desenvolvida para aproximar alunos, professores e suas atividades em um único ambiente. Mais do que um planner, é um espaço pensado para acompanhar a rotina de estudos, facilitar a comunicação acadêmica e tornar cada etapa do aprendizado mais organizada.
 
----
+Aqui, trabalhos não precisam se perder entre mensagens, provas não precisam surgir de surpresa e acompanhar o próprio desempenho não precisa ser complicado.
 
-## ✨ Principais recursos
-
-### 🎨 Visual
-- **Identidade Nuvia em pixel art**: noite lilás, gatinhos, plantas e laços em tons de rosa, com tipografia `Pixelify Sans` nos títulos e fundos estrelados. Um modo claro correspondente, **Normal Mode**, mantém o mesmo carinho em tons creme e rosa.
-- **Sidebar fixa à esquerda** com logo, navegação (Início, Minhas Tarefas, Matérias, Calendário, Notificações e Configurações), seletor **Dark/Normal**, toggle do **Lofi Mode** e o perfil do estudante no rodapé. Em telas menores ela vira uma gaveta recolhível.
-- **Topbar** com campo de busca de tarefas e matérias, atalho para notificações, acesso ao perfil e saída.
-- **Banner de boas-vindas** com saudação por horário (“Bom dia / Boa tarde / Boa noite”) e cartão de data ao lado.
-- **🎨 Dois modos + um modo opcional** (⚙️ Configurações → **Aparência**):
-  - **Dark Mode** (noite lilás, padrão) e **Normal Mode** (claro, tons creme e rosa), alternáveis pelo botão sol/lua na sidebar.
-  - **Lofi Mode**, opcional e independente: uma camada aconchegante (pixel art, chuva, tipografia dos títulos em `Pixelify Sans`, widget de rádio lo-fi e o **quarto de estudos** exclusivo do calendário) que funciona **tanto no Dark Mode quanto no Normal Mode**.
-  - Liga/desliga pelo botão na sidebar ou pelo interruptor em Configurações → Aparência — ao desligar, tudo volta à aparência padrão do modo atual.
-  - Clique num card de modo para **aplicar na hora**; a preferência fica salva **na conta (banco de dados)**, vale para qualquer dispositivo.
-  - O **calendário do mês** acompanha o modo e o Lofi Mode — com o Lofi ativo usa o layout exclusivo de quarto de estudos, inclusive com clima escuro no Dark Mode.
-  - Organizado com **variáveis CSS**: base em `frontend/estilo.css` + acabamentos compartilhados em `frontend/temas.css` + a identidade Nuvia (dark/light) em `frontend/nuvia.css` + a camada Lofi (independente do tema) em `frontend/lofi.css` + registro em `backend/src/temas.js`.
-- Ícone de **engrenagem ⚙️** na sidebar → página de **Configurações**.
-- Responsivo em desktop, notebook, tablet e celular.
-
-### 🔐 Login
-- Tela de entrada **Nuvia**: noite lilás em pixel art, cena completa do quartinho de estudos (janela com lua, gato cochilando, laptop, plantas), formulário em painel escuro e botão com a patinha.
-- **Contas demo** com um clique na tela de entrada: cartões de `Aluna` (ana@escola.com) e `Professora` (maria@escola.com) — o cartão `Admin` só aparece fora de produção. Defina `MOSTRAR_DEMO=0` no `.env` para ocultar todos.
-- **Manter conectado** (sessão de 30 dias) ou sessão só no navegador.
-- **Cadastro em duas divisórias**: **Aluno** e **Professor**, escolhidas por abas na própria página de cadastro.
-  - **Aluno**: nome completo, **e-mail institucional da escola**, senha e confirmação de senha, e a **turma desejada**. O endereço precisa terminar em `ESCOLA_EMAIL_DOMINIO` (padrão `escola.pr.gov.br`). Ao criar a conta, o sistema envia um **e-mail de confirmação**; só depois de confirmar o aluno pode pedir o **código de acesso** da turma escolhida; o código chega por e-mail, vale 7 dias e é de **uso único** — o aluno digita o código na página "Entrar em uma turma" e só então fica vinculado à turma.
-  - **Professor**: nome completo, e-mail, senha e confirmação de senha, e as **matérias que leciona** em seleção múltipla (Introdução a Programação, Introdução a Computação, Análise e Métodos de Sistemas, Banco de Dados, Ed Dig Comp Prog e Ia, Lógica Computacional, Química, Matemática, Língua Portuguesa, Língua Inglesa, Geografia, Educação Física, Biologia e Artes). As matérias ficam salvas no banco associadas ao professor.
-  - As turmas — **1º ao 3º ano Técnico em DS**, **1º ao 3º ano Técnico em Adm**, **1º ao 3º ano Ensino Médio** e **1º DSB** — e as 14 matérias são gerenciadas pelo banco (o admin também pode adicionar outras turmas, ex.: 9º B), nunca por uma lista fixa no frontend.
-- **Login com Google e GitHub** (OAuth 2.0, authorization code): só entra quem já tem uma conta Nuvia com o mesmo e-mail verificado; ver [COMO-CONFIGURAR-LOGIN-SOCIAL.md](COMO-CONFIGURAR-LOGIN-SOCIAL.md).
-- **Esqueci a senha**: recuperação por pergunta de segurança + redefinição pelo admin.
-- Mensagens de erro seguras: `"Email ou senha incorretos"` (não revela se a conta existe).
-- Tentativas de login limitadas (proteção contra força bruta).
-
-### 🎓 Área do Aluno
-- **Dashboard inicial**: banner com saudação por horário, cartão de data, **Sua semana** (planner dos próximos 7 dias com pontinhos por tipo de atividade), **Modo foco** (cronômetro configurável com **trilha lo-fi** — 3 trilhas geradas offline no navegador + integração oficial com YouTube e Spotify; o cronômetro acompanha você por todas as páginas via mini-timer flutuante), **Minhas Tarefas** com filtros funcionais (`Todas`, `A fazer`, `Entregues`, `Corrigidas`), **Minhas Matérias** em cards com ícone, média/desempenho e barra de progresso, mini-calendário navegável, **Próximas Tarefas** e um gatinho companheiro na página.
-- **Status coloridos** nas tarefas: verde para corrigida, azul para entregue, laranja para pendente e vermelho para atrasada.
-- **Busca** na topbar filtra tarefas e matérias pelo nome (`?q=`).
-- **Notificações**: página com prazos próximos, atividades atrasadas, entregas enviadas e correções recebidas, geradas a partir dos dados reais da conta.
-- **Linha inteira da tarefa clicável**: abre o detalhe do trabalho.
-- **Página da matéria em painel**: lista de trabalhos + resumo lateral com entregues, progresso e próximo prazo.
-- **Detalhe do trabalho em painel**: descrição, prazo, entrega/correção e envio + resumo lateral (situação, prazo, envio, nota), orientações de entrega e atalhos.
-- Grade de **cards das matérias** da turma (cada matéria com o nome do professor).
-- Abas de filtro dos trabalhos: `Todos` · `Não corrigidos` · `Corrigidos` · `Atrasados`
-  - *Não corrigidos*: entregue, aguardando correção
-  - *Corrigidos*: com nota e observação do professor
-  - *Atrasados*: prazo vencido e não entregue (ou entregue fora do prazo)
-- Envio de arquivo (PDF, DOCX, PPTX, XLSX, JPG/PNG, TXT — até 15 MB).
-- **Outras formas de entrega**: abas **Arquivo**, **Link** (site, artigo, post) e **Google Drive** (link compartilhado), com validação de URL e chips de categorias (documentos, planilhas, apresentações, imagens).
-- **Reenvio permitido enquanto o trabalho não for corrigido.**
-
-### 🗓️ Calendário do mês (aluno e professor)
-- Página própria com grade do **mês**, prazos e provas marcados por dia.
-- **Acompanha o modo e o Lofi Mode**: com o Lofi ativo usa o visual lo-fi / dreamy em pixel art (Normal Mode: creme aconchegante; Dark Mode: noite de estudos estrelada); sem o Lofi usa o layout clássico com as cores, fontes, cantos e brilhos do modo ativo.
-- **Clique num dia com atividades** para filtrar a lista do mês abaixo (marca o dia selecionado no calendário e mostra um chip "Filtrado por …" com botão para limpar). Funciona também pelo teclado.
-- **Professor** pode usar **+ Adicionar evento** para marcar provas/projetos/eventos no mês; o aluno apenas visualiza.
-- **Barra lateral escura** com navegação em ícones pixel, estante de livros, luas e plantinhas, no estilo do quarto de estudos.
-- **Player lo-fi** funcional (acordes, baixo e chuva sintetizados com Web Audio — sem arquivos externos).
-- Rodapé com **resumo do dia**, **progresso do mês** e legenda de cores.
-- Indicadores coloridos: **tarefa/quiz**, **entrega**, **prova**, **projeto** e **evento**.
-- No celular, a grade mantém o **mês inteiro**; as atividades viram pontinhos coloridos por tipo.
-- Ilustrações em SVG pixel art geradas por `scripts/gerar-pixel-art.js` e salvas em `frontend/img/lofi/`.
-- **Biblioteca de decorações Nuvia** recortada da cartela oficial em pixel art, com PNGs transparentes em `frontend/assets/decorations/`:
-  - `cats/` — gatinhos com laço, dormindo na almofada, no sofá, com auréola e espiando.
-  - `plants/` — plantas penduradas, vasos com flores e plantinhas.
-  - `stationery/` — livros, estante, notebook, caderno, bloco e lápis.
-  - `celestial/` — lua, estrelas, brilhos e corações.
-  - `accessories/` — laços, almofada, caneca, fones, envelope, patinhas, quadro e janela.
-  - `details/` — acabamentos micro (asas, patinhas, laços, brilhos).
-  - `ui/` — ícones e componentes de interface (barras, cartão, balão de fala).
-- Componente reutilizável `decoracao(nome, opções)` em `backend/src/paginas/decoracoes.js` (tamanho, posição, margem, opacidade, rotação, visibilidade e `alt`).
-- A página de **calendário com o Lofi Mode ativo** usa a biblioteca Nuvia (cenas, gatinhos, plantas, laços, luas e estrelas); o dashboard usa apenas formas e ícones minimalistas.
-
-### 🖼️ Biblioteca de decorações (Nuvia Pixel Art)
-
-Os recortes foram extraídos da cartela oficial (`frontend/assets/source/nuvia-assets-sheet.png`), mantendo transparência real, contorno, sombras, cores e proporção. Nenhuma ilustração foi redesenhada. Os novos arquivos usam o prefixo `nuvia-` e convivem com a biblioteca anterior, que continua intacta.
-
-Uso do componente no backend:
-
-```js
-const { decoracao } = require('./decoracoes');
-
-decoracao('nuvia-cat-sleeping-pillow', {
-  pasta: 'cats',
-  tamanho: 160,          // px ou string CSS
-  opacidade: 0.9,
-  rotacao: -10,          // graus, sem distorcer
-  top: '12px', right: '10px',  // posicionamento absoluto opcional
-  margem: '8px',
-  ocultarEm: 'mobile',   // 'mobile' | 'tablet' | 'sempre'
-  alt: 'Gatinho dormindo em uma almofada rosa',
-});
-```
-
-O CSS base fica em `frontend/decoracoes.css` (`.deco`, `.deco--abs`, classes de visibilidade) e preserva a proporção com `width` + `height: auto`, `image-rendering: pixelated` e `pointer-events: none`.
-
-### 👩‍🏫 Área do Professor
-- **Dashboard inicial**: banner com saudação, cartão de data, **Entregas para corrigir**, **Minhas Matérias** com progresso de correções, mini-calendário navegável e **Próximas Tarefas**.
-- **Notificações**: novas entregas e entregas fora do prazo, com atalho direto para a correção.
-- **Página da matéria em painel**: publicar atividades + resumo lateral (entregas, correções pendentes e próximo prazo).
-- **Tela de correção em painel**: entregas dos alunos + resumo lateral (prazo, alunos, entregues, corrigidas, média e progresso), lista de quem está aguardando e de quem não entregou (com atalho para o aluno).
-- Cards das turmas/matérias que leciona (com entregas aguardando correção).
-- Criar **atividade com prazo de entrega**; filtros `Todas / Aguardando correção / Corrigidas`.
-- Lista de alunos com download do arquivo e correção: **nota (0–10) + observação**.
-
-### ⚙️ Área do Admin
-- **Painel com resumo lateral**: totais de turmas, alunos, professores, matérias e vínculos, alertas (sem vínculo/sem turma) e atalhos.
-- **CRUD completo**: criar, consultar, **editar e excluir** turmas, matérias, professores e alunos (com proteções para não apagar dados em uso).
-- Cadastrar **turmas** (gera o **código de matrícula**, com botão "Copiar" e regeneração).
-- Cadastrar **disciplinas** e **professores**.
-- **Vincular professor ↔ turma ↔ matéria** (é daí que o aluno escolhe quem é professor de quê).
-- Gerenciar alunos (trocar turma, redefinir senha, ativar/desativar).
-
-### 📱 Aplicativo instalável (PWA)
-- **Manifesto** (`frontend/manifest.json`, com `manifest.webmanifest` mantido para compatibilidade) com nome, ícones 192/512, cores e atalhos.
-- **Service Worker** (`frontend/sw.js`): cache dos arquivos estáticos e página **“Sem conexão”** quando a internet cai.
-- **Instalável** em Android (Chrome), iPhone/iPad (Safari) e computador — abre em tela cheia, com ícone próprio.
-- Botão flutuante **Instalar app** aparece quando o navegador permite; some sozinho após alguns segundos e no iPhone mostra o passo a passo.
-- Nenhuma página autenticada, foto ou arquivo enviado é guardado no cache (privacidade).
-
-### ⚙️ Configurações (engrenagem)
-- **Foto de perfil** (JPG/PNG/WebP até 2 MB) ou inicial num círculo colorido.
-- **Nome**, **email** e **turma conectada** (aluno) / matérias que leciona (professor).
-- Alterar **senha** e **pergunta de segurança**.
-- Escolha entre **Dark Mode** e **Normal Mode** + interruptor do **Lofi Mode** (funciona nos dois).
+Tudo tem seu lugar. Tudo tem seu momento.
 
 ---
 
-## 🛠️ Tecnologia
+## ✦ O que você encontra no Nuvia?
 
-| Item | Escolha |
-|---|---|
-| Backend | **Node.js + Express 5** |
-| Banco de dados | **PostgreSQL** (`pg` + pool de conexões) |
-| Sessões | `express-session` com store no PostgreSQL (`connect-pg-simple`) |
-| Uploads | `multer` (arquivos fora da área pública) |
-| Frontend | HTML + CSS + JS puro, ícones SVG embutidos |
-| PWA | `manifest.json` + Service Worker (`sw.js`) para instalação e modo offline |
-| Senhas | Hash `scrypt` + salt (nativo do Node) |
-| Configuração | `dotenv` (arquivo `.env`) |
-| Banco local | PostgreSQL embutido via `embedded-postgres` (nada para instalar no dev) |
+### 📚 Matérias e aulas
+Tenha suas disciplinas organizadas em um só lugar. Consulte professores, atividades, informações da turma e acompanhe seu progresso ao longo do período letivo.
 
----
+### 📝 Trabalhos e entregas
+Envie atividades diretamente para os professores, utilizando arquivos, links ou Google Drive. Acompanhe o andamento das entregas e faça reenvios enquanto aguardam correção.
 
-## ▶️ Como executar
+### 📅 Calendário escolar
+Visualize provas, projetos, eventos e compromissos em uma grade mensal. Saiba o que está por vir e organize seu tempo com antecedência.
 
-**Requisitos:** Node.js **20+**.
+### ⭐ Notas e correções
+Acompanhe suas avaliações, notas de 0 a 10 e observações dos professores. Entenda o resultado de cada atividade e acompanhe seu desempenho.
 
-```bash
-npm install        # primeira vez
-npm start          # sobe o banco (se local) + prepara as tabelas + inicia o site
-```
+### 🗓️ Planner semanal
+Organize sua semana, visualize tarefas por dia, marque atividades concluídas e tenha uma visão mais clara das suas prioridades.
 
-Abra <http://localhost:3000> — na rede da escola: `http://IP-DA-MÁQUINA:3000`.
+### 🐈 Modo foco
+Um espaço dedicado à concentração, com temporizador de estudos, pausas e um gatinho de companhia. Estude no seu ritmo, sem transformar produtividade em pressão.
 
-### 👤 Acessos de teste (ambiente local)
-
-| Perfil | E-mail | Senha |
-|---|---|---|
-| Admin | `admin@escola.com` | `admin123` |
-| Aluno | `ana@escola.com` | `aluno123` |
-| Professora | `maria@escola.com` | `prof123` |
-| Professor | `joao@escola.com` | `prof123` |
-
-> ⚠️ Troque as senhas depois do primeiro acesso.
-
-**No site publicado** já existem dados de demonstração prontos:
-
-| Perfil | E-mail | Senha |
-|---|---|---|
-| Professora (Maria) | `maria@escola.com` | `prof123` |
-| Professor (João) | `joao@escola.com` | `prof123` |
-| Aluna (Ana) | `ana@escola.com` | `aluno123` |
-
-Há as turmas **1º ao 3º ano Técnico em DS**, **1º ao 3º ano Técnico em Adm**,
-**1º ao 3º ano Ensino Médio** e **1º DSB** (além de 9º Ano A e 1º Ano B no banco local),
-as 14 matérias oficiais e vínculos professor ↔ turma ↔ matéria já configurados. O acesso **administrador** é criado
-pelas variáveis `ADMIN_EMAIL` / `ADMIN_SENHA` configuradas no Render — a senha
-**não** fica no repositório. Troque-a em **Configurações** depois do primeiro acesso.
-
-### 🌐 Sistema online
-
-| O que | Endereço |
-|---|---|
-| 🌍 Site (Nuvia) | <https://nuvia-s54c.onrender.com> |
-| 💻 Repositório público | <https://github.com/llecaz/sistemax> |
-
-O site está publicado no **Render** (plano gratuito, região Oregon) com
-**PostgreSQL** persistente. O primeiro acesso depois de um período sem uso pode
-levar ~50 segundos porque a instância gratuita hiberna.
-
-O projeto traz [`render.yaml`](render.yaml) e o guia completo em
-[`DEPLOY-RENDER.md`](DEPLOY-RENDER.md), que explica como recriar o deploy,
-configurar o primeiro administrador (`ADMIN_EMAIL` / `ADMIN_SENHA`), atualizar
-os callbacks do login social e instalar o PWA no celular.
-
-### ⚙️ Configuração do banco (`.env`)
-
-Copie o modelo e ajuste:
-
-```bash
-cp .env.exemplo .env
-```
-
-| Variável | Descrição |
-|---|---|
-| `AMBIENTE` | `local` (PostgreSQL desta máquina) ou `producao` (banco externo) |
-| `DATABASE_URL_LOCAL` | Conexão do PostgreSQL local — padrão: `postgresql://sistemax:sistemax@127.0.0.1:5433/sistemax` |
-| `DATABASE_URL_PRODUCAO` | Conexão do banco externo (Render, Neon, servidor da escola) |
-| `PORT` | Porta do site (padrão 3000) |
-| `SESSION_SECRET` | Segredo das sessões — troque por algo longo e único |
-| `SITE_URL` | URL pública do site |
-| `ESCOLA_EMAIL_DOMINIO` | Domínio do e-mail institucional dos alunos (padrão `escola.pr.gov.br`) |
-| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` / `SMTP_FROM` | Envio de e-mails (confirmação e código da turma). Sem SMTP, em desenvolvimento, os e-mails são impressos no console do servidor |
-
-**No modo `local`** o servidor sobe um PostgreSQL de verdade automaticamente (pasta `.pglocal/`) — sem sudo e sem Docker.
-**No modo `producao`** basta apontar `DATABASE_URL_PRODUCAO` para o banco; as tabelas e os dados iniciais são criados sozinhos.
-
-> 🔎 **Aviso:** algumas redes bloqueiam a porta `5432`. Se o site rodar em uma rede assim, use o modo `local` (as conexões são internas) ou um banco acessível pela rede permitida.
+### 🎨 Personalização
+Deixe seu cantinho com a sua identidade. Explore temas claros e escuros, decorações em pixel art e elementos visuais que tornam a experiência mais aconchegante.
 
 ---
 
-## 📁 Estrutura do projeto
+## ✦ Como funciona?
 
-O projeto está dividido em **duas pastas**: `backend/` (servidor) e `frontend/` (arquivos do navegador).
+O Nuvia conecta a organização escolar à rotina de quem estuda.
 
-```
-sistemax/
-├── backend/                 # Lado servidor (Node.js + Express)
-│   ├── servidor.js          # Inicia banco + servidor Express
-│   └── src/
-│       ├── app.js           # Configuração do Express (sessões, rotas, estáticos)
-│       ├── db.js            # Pool de conexão com o PostgreSQL
-│       ├── schema.sql       # Esquema das tabelas (idempotente)
-│       ├── criarBanco.js    # Cria tabelas + insere dados de exemplo
-│       ├── seed.js          # Dados iniciais (admin, turmas, matérias, professores)
-│       ├── auth.js          # Senhas (scrypt), sessão e proteção de rotas
-│       ├── temas.js         # ⭐ Registro dos modos de aparência (fonte única)
-│       ├── regras.js        # Regras de status (atrasado/corrigido/etc.)
-│       ├── util.js          # Escape HTML, datas, cores, códigos
-│       ├── postgresLocal.js # PostgreSQL local embutido (modo local)
-│       ├── paginas/         # HTML gerado (layout, login, aluno, professor, admin, config)
-│       │   └── decoracoes.js # ⭐ Componente decoracao() da biblioteca pixel art
-│       └── rotas/           # Rotas (auth, aluno, professor, admin, config, arquivos)
-├── frontend/                # Lado cliente (estáticos servidos pelo Express)
-│   ├── manifest.json        # ⭐ Manifesto PWA (nome, ícones, atalhos)
-│   ├── manifest.webmanifest #    Manifesto alternativo (compatibilidade)
-│   ├── sw.js                # ⭐ Service Worker (cache + modo offline)
-│   ├── pwa.js               # ⭐ Registro do SW e botão "Instalar app"
-│   ├── offline.html         # ⭐ Página exibida sem conexão
-│   ├── icons/               # ⭐ Ícones 192x192 e 512x512 do aplicativo
-│   ├── estilo.css           # Base (variáveis) + shell SaaS + dashboard
-│   ├── temas.css            # ⭐ Acabamentos compartilhados + Lofi Mode (transições, rádio)
-│   ├── decoracoes.css       # ⭐ Componente .deco da biblioteca
-│   ├── lofi.css             # ⭐ Camada Lofi Mode: quarto de estudos (calendário) + acento sutil nas configurações
-│   ├── lofi.js              # ⭐ Player lo-fi (Web Audio API)
-│   ├── assets/decorations/  # ⭐ PNGs transparentes Nuvia (cats, plants, stationery, celestial, accessories, details, ui)
-│   ├── assets/source/       # ⭐ Cartela original nuvia-assets-sheet.png
-│   ├── img/lofi/            # ⭐ Ilustrações pixel art (gatos, livros, plantas, lua)
-│   └── app.js               # Aparência (modos + Lofi), menu, confirmações, seleção de arquivos
-├── scripts/gerar-pixel-art.js  # Gera os SVGs das ilustrações do calendário
-├── backend/uploads/         # Arquivos enviados (fora da área pública)
-├── package.json             # Scripts: start, dev, criar-banco
-├── render.yaml              # ⭐ Deploy automático no Render (site + PostgreSQL)
-├── DEPLOY-RENDER.md         # ⭐ Passo a passo de publicação e PWA
-├── .env.exemplo             # Modelo de configuração
-└── README.md
-```
+**01 — A escola organiza**
+
+Turmas, matérias e professores são vinculados pela coordenação.
+
+**02 — Você cria sua conta**
+
+Faça seu cadastro e personalize seu espaço de estudos.
+
+**03 — Planeje sua semana**
+
+Consulte atividades, provas, eventos e compromissos no planner e no calendário.
+
+**04 — Estude e acompanhe seu progresso**
+
+Entregue atividades, receba correções e acompanhe suas conquistas acadêmicas.
 
 ---
 
-## 🎨 Sistema de aparência — como mexer
+## ✦ Uma plataforma feita para a rotina real
 
-O sistema tem **dois modos** (`nuvia` = Dark Mode, `nuvia-day` = Normal Mode) e a camada **Lofi Mode** (independente do modo, salva em `usuarios.lofi`).
+O Nuvia nasceu de uma ideia simples: a organização escolar pode ser mais acessível, visual e agradável.
 
-1. **Modos**: registre em [`backend/src/temas.js`](backend/src/temas.js) e crie o bloco de variáveis em [`frontend/nuvia.css`](frontend/nuvia.css) com o seletor `[data-tema='seu-id']`.
-2. **Tokens compartilhados** (transição suave, rádio lo-fi): [`frontend/temas.css`](frontend/temas.css).
-3. **Lofi Mode**: ative/desative pelo botão na sidebar ou em Configurações → Aparência (vale nos dois modos). O CSS em [`frontend/lofi.css`](frontend/lofi.css) só vale com `html[data-lofi='on']`. O calendário troca para o "quarto de estudos" quando o modo está ativo; as Configurações mantêm a aparência do tema ativo (apenas títulos em Pixelify Sans e um fundo quadriculado discreto), sem mudar posição ou paleta.
-4. Contas antigas com temas removidos caem no modo equivalente (escuros → Dark Mode, claros → Normal Mode) automaticamente.
+Em vez de espalhar informações por diferentes lugares, a proposta é reunir aquilo que faz parte da vida acadêmica em um único ambiente.
 
-O modo padrão de novos usuários é o **Dark Mode** (`nuvia`, coluna `usuarios.tema`).
+Seja para lembrar de uma prova, entregar um trabalho, consultar uma nota ou simplesmente encontrar um pouco de concentração, existe um espaço para cada coisa.
 
----
+Não se trata de fazer tudo de uma vez.
 
-## 🗃️ Banco de dados (7 tabelas)
-
-| Tabela | Função |
-|---|---|
-| `usuarios` | admin, professores e alunos (nome, e-mail, senha, pergunta de segurança, **modo de aparência**, **lofi** e `email_verificado`) |
-| `turmas` | turmas (1º DSB, Técnico em DS/Adm e Ensino Médio) com código de matrícula |
-| `disciplinas` | as 14 matérias oficiais (Introdução a Programação, Banco de Dados, Matemática...) |
-| `professor_disciplinas` | matérias que o professor leciona (escolhidas no cadastro) |
-| `turma_disciplina` | ⭐ vínculo **turma ↔ matéria ↔ professor** (o coração do sistema) |
-| `atividades` | trabalho criado pelo professor: título, descrição e **prazo** |
-| `entregas` | arquivo do aluno + nota + observação do professor |
-| `verificacao_email` | tokens de confirmação de e-mail (guardados com hash, 24 h, uso único) |
-| `codigos_turma_acesso` | códigos enviados por e-mail para a turma (uso único, 7 dias, validados no servidor) |
-| `session` | sessões dos usuários (guardadas no PostgreSQL) |
+Trata-se de dar um passo de cada vez.
 
 ---
 
-## 🔒 Segurança
+## ☁️ NUVIA
 
-- Senhas com hash `scrypt` + salt (nunca em texto puro).
-- Sessão por cookie `httpOnly` + token no PostgreSQL (dá para encerrar sessão de qualquer lugar).
-- Limite de tentativas de login (força bruta).
-- Arquivos fora da pasta pública — baixados apenas pelo aluno dono, pelo professor da matéria ou pelo admin.
-- Todo texto exibido é escapado (proteção contra XSS/injeção).
-- Mensagens de login genéricas, sem revelar se a conta existe.
-- `.env` (com as credenciais do banco) fora do Git.
-- **Cadastro de aluno fechado apenas para o e-mail da escola** (campo validado no servidor) e turma liberada só com código recebido por e-mail (uso único, 7 dias, expirado no servidor).
-- **Confirmação de e-mail obrigatória** antes de pedir o código da turma; links de confirmação de uso único e validade de 24 h.
-- Usuário não altera o próprio perfil para administrador (as rotas de configuração só tocam nome, foto, senha, aparência e pergunta de segurança).
-- Um usuário só vê o que é dele: o professor só enxerga os próprios vínculos; o aluno só vê as atividades da própria turma.
+**Seu cantinho. Seu ritmo. Sua evolução.**
 
----
-
-## 🧭 Fluxo completo de uso
-
-1. **Admin** entra → cadastra turmas (ex.: 1º DSB, 9º B) e professores → **vincula professor ↔ turma ↔ matéria**.
-2. **Professor** entra no site → *"Criar conta" → "Professor"* → preenche nome, e-mail, senha e escolhe as matérias que leciona.
-3. **Aluno** entra no site → *"Criar conta" → "Aluno"* → preenche nome, e-mail institucional, senha e confirmação + a turma desejada → confirma o e-mail pelo link → pede o **código de acesso** → recebe o código por e-mail → digita na página "Entrar em uma turma".
-4. **Professor** cria uma **atividade com prazo** numa das suas matérias.
-5. **Aluno** abre a matéria → envia o arquivo (pode reenviar enquanto não corrigido).
-6. **Professor** baixa o arquivo → dá **nota e observação**.
-7. **Aluno** acompanha nas abas `Não corrigidos` / `Corrigidos` / `Atrasados`.
-8. Qualquer usuário configura **foto, dados e aparência** pelo ícone ⚙️.
+Um pequeno passo de cada vez — e o semestre inteiro fica mais leve.
